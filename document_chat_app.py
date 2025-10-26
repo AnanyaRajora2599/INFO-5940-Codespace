@@ -15,14 +15,15 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.documents import Document
 
 
-load_dotenv()  # ensures env vars are loaded any time config is imported
+load_dotenv()  # load env vars
 
 # Base URL
 OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
 OPENAI_BASE_URL=os.getenv("OPENAI_BASE_URL", "https://api.ai.it.cornell.edu")
 
-# Directories
+# Vector Store
 PERSIST_DIR = os.getenv("PERSIST_DIR", ".chroma")
+COLLECTION = "assignment1"
 
 # Embeddings + LLM (LiteLLM/OpenAI-compatible)
 EMBED_MODEL = os.getenv("EMBED_MODEL", "openai.text-embedding-3-large")
@@ -66,7 +67,7 @@ def get_document_chunks(docs):
     )
     return splitter.split_documents(docs)
 
-def build_or_update_index(chunks, collection_name="assignment1"):
+def build_or_update_index(chunks, collection_name=COLLECTION):
     embeddings = OpenAIEmbeddings(model=EMBED_MODEL)
     vs = Chroma(
         collection_name=collection_name,
@@ -77,7 +78,7 @@ def build_or_update_index(chunks, collection_name="assignment1"):
     vs.persist()
     return vs
 
-def list_index_stats(collection_name="assignment1"):
+def list_index_stats(collection_name=COLLECTION):
     embeddings = OpenAIEmbeddings(model=EMBED_MODEL)
     vs = Chroma(
         collection_name=collection_name,
@@ -99,7 +100,7 @@ def _format_context(docs: List[Document]) -> str:
         lines.append(f"[{tag}] {d.page_content}")
     return "\n\n".join(lines)
 
-def get_retriever(collection_name="assignment1"):
+def get_retriever(collection_name=COLLECTION):
     embeddings = OpenAIEmbeddings(model=EMBED_MODEL)
     vs = Chroma(
         collection_name=collection_name,
@@ -108,12 +109,12 @@ def get_retriever(collection_name="assignment1"):
     )
     return vs.as_retriever(search_type="mmr", k=TOP_K, fetch_k=FETCH_K)
 
-def answer_question(question: str, chat_history: List[Dict], collection_name="assignment1"):
+def answer_question(question: str, chat_history: List[Dict], collection_name=COLLECTION):
     retriever = get_retriever(collection_name)
     try:
-        docs = retriever.invoke(question)  # LC 0.2+
+        docs = retriever.invoke(question)
     except AttributeError:
-        docs = retriever.get_relevant_documents(question)  # LC <0.2 fallback
+        docs = retriever.get_relevant_documents(question)
 
     context = _format_context(docs)
 
@@ -122,7 +123,6 @@ def answer_question(question: str, chat_history: List[Dict], collection_name="as
         SystemMessage(content=f"Context documents:\n\n{context}"),
     ]
 
-    # Optionally include short history to help co-reference
     for turn in chat_history[-4:]:
         messages.append(HumanMessage(content=turn["user"]))
         messages.append(SystemMessage(content=f"Assistant (previous): {turn['assistant']}"))
@@ -133,11 +133,11 @@ def answer_question(question: str, chat_history: List[Dict], collection_name="as
     resp = llm.invoke(messages)
     return resp.content, docs
 
-st.set_page_config(page_title="Assignment 1 — RAG Chat", layout="wide")
-st.title("Assignment 1 — RAG Chat")
+st.set_page_config(page_title=APP_TITLE, layout="wide")
+st.title(APP_TITLE)
 
 if "history" not in st.session_state:
-    st.session_state.history = []  # [{"user": "...", "assistant": "..."}]
+    st.session_state.history = []
 
 if "tmp_paths" not in st.session_state:
     st.session_state.tmp_paths = []
@@ -177,12 +177,11 @@ with st.sidebar:
         try:
             emb = OpenAIEmbeddings(model=os.getenv("EMBED_MODEL", EMBED_MODEL))
             vs = Chroma(
-                collection_name="assignment1",
+                collection_name=COLLECTION,
                 embedding_function=emb,
                 persist_directory=PERSIST_DIR,
             )
-            # Drop just this collection
-            vs._client.delete_collection("assignment1")
+            vs._client.delete_collection(COLLECTION)
         except Exception as e:
             # If the collection doesn't exist or client is locked, fall back to nuking the directory
             errors.append(f"_client.delete_collection: {e}")
