@@ -148,12 +148,12 @@ if "uploader_key" not in st.session_state:
 with st.sidebar:
     st.header("Documents")
     current_key = f"uploader_{st.session_state.uploader_key}"
-    uploaded = st.file_uploader("Upload .txt/.md/.pdf", accept_multiple_files=True, type=["txt", 'md', "pdf"], key=current_key,)
+    uploaded = st.file_uploader("Please upload one or many .txt/.md/.pdf file(s)", accept_multiple_files=True, type=["txt", 'md', "pdf"], key=current_key,)
     if uploaded:
         if st.button("Index uploaded files"):
             # Upload the files
             print("Uploaded files:", [f.name for f in uploaded])
-            with st.spinner("Indexing..."):
+            with st.spinner("Your file(s) are being Indexed..."):
                 tmp_paths = []
                 for f in uploaded:
                     suffix = os.path.splitext(f.name)[1].lower()
@@ -165,14 +165,14 @@ with st.sidebar:
                 docs = load_documents(tmp_paths)
                 chunks = get_document_chunks(docs)
                 build_or_update_index(chunks)
-            st.success("Indexed!")
+            st.success("Indexing completed successfully!!!")
     else:
         st.info("Upload files first.")
 
     stats = list_index_stats()
     st.caption(f"Vector store: {stats['collection']} — {stats['docs']} chunks")
 
-    if st.button("Clear vector store & uploaded files"):
+    if st.button("Erase uploaded file(s)"):
         errors = []
 
         # Delete the Chroma collection via the LangChain wrapper's underlying client
@@ -227,11 +227,11 @@ for turn in st.session_state.history:
     with st.chat_message("assistant"):
         st.write(turn["assistant"])
 
-if prompt := st.chat_input("Ask about your documents…"):
+if prompt := st.chat_input("Ask any questions about the file(s) you uploaded here…"):
     with st.chat_message("user"):
         st.write(prompt)
     with st.chat_message("assistant"):
-        with st.spinner("Thinking…"):
+        with st.spinner("Reading file(s) and processing answer.."):
             answer, docs = answer_question(prompt, st.session_state.history)
             st.write(answer)
     st.session_state.history.append({"user": prompt, "assistant": answer})
