@@ -1,5 +1,17 @@
 # ref-log.md
 
+## Implementation Details & Design Choices
+
+- The application uses `OPENAI` model to embed and process documents and user Questions.
+- For model it uses `openai.gpt-5-chat` as it is the latest model from OPENAI and fastest chat model. For retaining larger contextual information the application uses `openai.text-embedding-3-large` embeddings. It also uses `temperature=0.2` to introduce some randomness in the behaviour of the model to generate unique responses.
+- It uses `STREAMLIT` to provide frontend interface with various helper methods performing the backend operations.
+- The App uses `CHROMADB` to store all the embeddings for processing the uploaded documents.
+- It performs chunking of documents by using `RecursiveCharacterTextSplitter` with some overlap between the chunks for faster retrieval and contextual linking between chunks.
+- For chunking by default it uses chunk size to be 1000. This was chosen based on information available online suggesting chunk size of 800-1200. Similarly Overlap of 150 was selected based on suggested range of 10%-20%.
+- The application uses Persistent storage for efficient usage of memory.
+- You can add .env file to make runtime changes to following parameters: `OPENAI_BASE_URL`, `PERSIST_DIR`, `COLLECTION`, `EMBED_MODEL`, `CHAT_MODEL`, `CHUNK_SIZE`, `CHUNK_OVERLAP`, `TOP_K`, `FETCH_K`, `APP_TITLE`, `SYSTEM_PROMPT`.
+- The app can clear the state of the chat to start a fresh chat without stopping the application.
+
 Generative AI prompts:
 
 - Use the given documentation and give me all the learning details for all the technologies used.
