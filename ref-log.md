@@ -13,6 +13,8 @@
 - You can add .env file to make application changes to following parameters: `OPENAI_BASE_URL`, `PERSIST_DIR`, `COLLECTION`, `EMBED_MODEL`, `CHAT_MODEL`, `CHUNK_SIZE`, `CHUNK_OVERLAP`, `TOP_K`, `FETCH_K`, `APP_TITLE`, `SYSTEM_PROMPT`.
 - If .env is available application will load the variables, otherwise will use the default values.
 - The app can clear the state of the chat to start a fresh chat without stopping the application.
+- When the user asks a `question` about any details from the document, the application takes that query and pass the query along with some chat history and embeddings to generate a response.
+- This response is then given back to the user.
 
 Generative AI prompts:
 
