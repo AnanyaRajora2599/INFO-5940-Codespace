@@ -40,7 +40,7 @@ FETCH_K = int(os.getenv("FETCH_K", "20"))
 # App
 APP_TITLE = "Assignment 1 — PDF and TXT RAG Chat"
 
-SYSTEM_PROMPT = """You are a helpful assistant answering only from the provided documents.
+START_PROMPT = """You are a helpful assistant answering only from the provided documents.
 - If the answer is not in the documents, say you can't find the answer in the given documents.
 - Cite each answer with source file name (and page if available).
 - Give helpful summary pointer at the end.
@@ -119,7 +119,7 @@ def answer_question(question: str, chat_history: List[Dict], collection_name=COL
     context = _format_context(docs)
 
     messages = [
-        SystemMessage(content=SYSTEM_PROMPT),
+        SystemMessage(content=START_PROMPT),
         SystemMessage(content=f"Context documents:\n\n{context}"),
     ]
 
@@ -153,7 +153,7 @@ with st.sidebar:
         if st.button("Index uploaded files"):
             # Upload the files
             print("Uploaded files:", [f.name for f in uploaded])
-            with st.spinner("Your file(s) are being Indexed..."):
+            with st.spinner("Your file(s) are being Processed..."):
                 tmp_paths = []
                 for f in uploaded:
                     suffix = os.path.splitext(f.name)[1].lower()
@@ -172,7 +172,7 @@ with st.sidebar:
     stats = list_index_stats()
     st.caption(f"Vector store: {stats['collection']} — {stats['docs']} chunks")
 
-    if st.button("Erase uploaded file(s)"):
+    if st.button("Clear chat data"):
         errors = []
 
         # Delete the Chroma collection via the LangChain wrapper's underlying client
@@ -193,7 +193,6 @@ with st.sidebar:
             except Exception as e2:
                 errors.append(f"rmtree fallback: {e2}")
 
-        # Delete all temp files we created for uploads
         for p in list(st.session_state.get("tmp_paths", [])):
             try:
                 if p and os.path.exists(p):
@@ -202,12 +201,10 @@ with st.sidebar:
                 errors.append(f"remove {p}: {e}")
         st.session_state["tmp_paths"] = []
 
-        # Reset chat and uploader
         st.session_state["history"] = []
 
-        # Clear the uploader's widget state and bump its key to visually reset it
-        st.session_state.pop(current_key, None)   # drop any residual widget value
-        st.session_state.uploader_key += 1        # force a brand-new uploader widget instance
+        st.session_state.pop(current_key, None)
+        st.session_state.uploader_key += 1
         st.rerun()
         
         # Refresh the app to reflect cleared state
