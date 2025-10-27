@@ -2,7 +2,7 @@
 
 This is a RAG application where users can upload documents and interact with the content through a chatbot.
 
-## Implementartion Details & Design Choices
+## Implementation Details & Design Choices
 
 - The application uses `OPENAI` model to embed and process documents and user Questions.
 - For model it uses `openai.gpt-5-chat` as it is the latest model from OPENAI and fastest chat model. For retaining larger contextual information the application uses `openai.text-embedding-3-large` embeddings. It also uses `temperature=0.2` to introduce some randomness in the behaviour of the model to generate unique responses.
