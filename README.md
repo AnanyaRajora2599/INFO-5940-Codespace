@@ -1,3 +1,15 @@
+# Description
+
+This is a RAG application where users can upload documents and interact with the content through a chatbot.
+
+## Implementartion Details
+
+- The application uses `OPENAI` model to embed and process documents and user Questions.
+- It performs chunking of documents with some overlap between the chunks for faster retrieval and contextual linking between chunks.
+- The application uses Persistent storage for efficient usage of memory.
+- You can add .env file to make runtime changes to following parameters: `OPENAI_BASE_URL`, `PERSIST_DIR`, `COLLECTION`, `EMBED_MODEL`, `CHAT_MODEL`, `CHUNK_SIZE`, `CHUNK_OVERLAP`, `TOP_K`, `FETCH_K`, `APP_TITLE`, `SYSTEM_PROMPT`.
+- The app can clear the state of the chat to start a fresh chat without stopping the application.
+
 ## Steps to run Document RAG application
 
 1. Make sure all the pip packages in the requirements.txt are installed.
