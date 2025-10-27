@@ -1,4 +1,25 @@
-# INFO 5940 
+## Steps to run Document RAG application
+
+1. Make sure all the pip packages in the requirements.txt are installed.
+
+2. Then run: `pip install chromadb`
+
+3. Then run the command: `OPENAI_API_KEY=<your-api-key> streamlit run document_chat_app.py`
+
+4. Then open the link in the browser.
+
+5. Click on the "Browse files" button and upload .txt files or PDFs, you can upload multiple documents.
+
+6. Once you have uploaded the files you will see an "Index uploaded files" button, click on that to chunk and process uploaded files.
+
+7. All the documents are indexed and these embeddings are stored in a local persistent Vector Store .chroma
+
+8. You can also click on "Clear vector & store uploaded files" button to clear the vector store collection and chat history, this will also remove all the uploaded documents.
+
+---
+
+# INFO 5940
+ 
 Welcome to the INFO 5940 repository. You will complete your work using [**GitHub Codespaces**](#about-github-codespaces) and save your progress in your own GitHub repository. This guide will walk you through setting up the development environment and running the test notebook.  
 
 ## Getting Started 

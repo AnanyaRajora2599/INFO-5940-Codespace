@@ -151,6 +151,7 @@ with st.sidebar:
     uploaded = st.file_uploader("Upload .txt/.md/.pdf", accept_multiple_files=True, type=["txt", 'md', "pdf"], key=current_key,)
     if uploaded:
         if st.button("Index uploaded files"):
+            # Upload the files
             print("Uploaded files:", [f.name for f in uploaded])
             with st.spinner("Indexing..."):
                 tmp_paths = []
@@ -159,7 +160,8 @@ with st.sidebar:
                     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
                         tmp.write(f.read())
                         tmp_paths.append(tmp.name)
-
+                
+                # Load, the documents then chunk it and then embed them in Vector Store
                 docs = load_documents(tmp_paths)
                 chunks = get_document_chunks(docs)
                 build_or_update_index(chunks)
