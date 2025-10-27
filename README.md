@@ -16,7 +16,7 @@ This is a RAG application where users can upload documents and interact with the
 
 ## Steps to run Document RAG application
 
-1. Make sure all the pip packages in the requirements.txt are installed.
+1. Make sure all the pip packages in the requirements.txt are installed using command `pip install -r requirements.txt`.
 
 2. Then run: `pip install chromadb`
 
